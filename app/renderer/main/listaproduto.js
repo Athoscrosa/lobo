@@ -4,7 +4,7 @@ const table = new DataTable("#tabela-produto", {
     responsive: true,
     processing: true,
     serverSide: true,
-    ajax: async(data, callback) => {
+    ajax: async (data, callback) => {
         const filter = {
             term: data?.search?.value,             //termo da pesquisa
             limit: data?.length,                 //Limite de registros a ser selecionado do banco
@@ -12,14 +12,23 @@ const table = new DataTable("#tabela-produto", {
             orderType: data?.order[0]?.dir,              // tipo de ordenação (asc ou desc)
             column: data?.order[0]?.column         //coluna a ser filtrada
         }
-        const response = await window.electronAPI.searchProducts(filter);
-        callback({
-            draw: response?.draw ?? data?.draw ?? 0,                     //contador de requisições
-            recordsTotal: response?.recordsTotal ?? 0,                     //total de registros no banco
-            recordsFiltered: response?.recordsFiltered ?? 0,             //total de registros filtrados
-            data: response?.data ?? []                                       //dados a serem exibidos na tabela
-        });
-       
+        try {
+            const response = await window.electronAPI.searchProducts(filter);
+            callback({
+                draw: response?.draw ?? data?.draw ?? 0, //Número de requisição para o servidor (usado para controle de concorrência)
+                recordsTotal: response?.recordsTotal ?? 0, //Total de registros sem filtro
+                recordsFiltered: response?.recordsFiltered ?? 0, //Total de registros com filtro
+                data: response?.data ?? [], //Dados da página atual
+            });
+        } catch (error) {
+            console.error('Restrição: ${error.message}');
+            callback({
+                draw: 0,
+                recordsTotal: 0,
+                recordsFiltered: 0,
+                data: []
+            })
+        }
     },
     columns: [
         { data: "codigo", name: "codigo" },
@@ -27,6 +36,10 @@ const table = new DataTable("#tabela-produto", {
         { data: "price", name: "Preço de Venda" }
     ]
 });
+
+
+
+
 const voltarButton = document.getElementById('voltar-button');
 const cadastroButton = document.getElementById('cadastro-button');
 
