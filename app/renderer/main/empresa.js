@@ -2,14 +2,16 @@ const saveButton = document.getElementById('save-button');
 
 saveButton.addEventListener('click', async () => {
     const data = {
-        name: document.getElementById('name').value,
-        cpf: document.getElementById('cpf').value,
-        rg: document.getElementById('rg').value,
+        razaoSocial: document.getElementById('razaoSocial').value,
+        nomeFantasia: document.getElementById('nomeFantasia').value,
+        cnpj: document.getElementById('cnpj').value,
+        ie: document.getElementById('ie').value,
     };
 
     try {
-        const result = await window.electronAPI.saveCliente(data);
-        console.log('Cliente salvo com sucesso:', result);
+        const result = await window.electronAPI.saveEmpresa(data);
+        console.log('Empresa salva com sucesso:', result);
+
         await Swal.fire({
             title: 'Sucesso!',
             text: 'Empresa salva com sucesso.',
@@ -18,8 +20,8 @@ saveButton.addEventListener('click', async () => {
             timer: 2000,
             timerProgressBar: true,
         });
-        
+
     } catch (error) {
-        console.error('Erro ao salvar cliente:', error);
+        console.error('Erro ao salvar empresa:', error);
     }
 });

@@ -53,7 +53,7 @@ vendaButton.addEventListener('click', async () => {
         if (!window.electronAPI || typeof window.electronAPI.openPage !== 'function') {
             throw new Error('API do Electron não foi injetada pelo preload');
         }
-        await window.electronAPI.openPage('listavenda.html');
+        await window.electronAPI.openPage('venda.html');
     } catch (error) {
         console.error('Erro ao abrir a janela de venda:', error);
     }

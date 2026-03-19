@@ -1,4 +1,4 @@
-const table = new DataTable("#tabela-produto", {
+const table = new DataTable("#tabela-usuario", {
     responsive: true,
     processing: true,
     serverSide: true,
@@ -11,7 +11,7 @@ const table = new DataTable("#tabela-produto", {
             column: data?.order[0]?.column         //coluna a ser filtrada
         }
         try {
-            const response = await window.electronAPI.searchProducts(filter);
+            const response = await window.electronAPI.searchUsuario(filter);
             callback({
                 draw: response?.draw ?? data?.draw ?? 0, //Número de requisição para o servidor (usado para controle de concorrência)
                 recordsTotal: response?.recordsTotal ?? 0, //Total de registros sem filtro
@@ -31,34 +31,7 @@ const table = new DataTable("#tabela-produto", {
     columns: [
         { data: "id", name: "Código" },
         { data: "name", name: "Nome" },
-        { data: "price", name: "Valor de Venda" }
+        { data: "email", name: "Email" },
+        { data: "contato", name: "contato" }
     ]
-});
-
-
-
-
-const voltarButton = document.getElementById('voltar-button');
-const cadastroButton = document.getElementById('cadastro-button');
-
-voltarButton.addEventListener('click', async () => {
-    try {
-        if (!window.electronAPI || typeof window.electronAPI.openPage !== 'function') {
-            throw new Error('API do Electron não foi injetada pelo preload');
-        }
-        await window.electronAPI.goHome();
-    } catch (error) {
-        console.error('Erro ao abrir a janela principal:', error);
-    }
-});
-
-cadastroButton.addEventListener('click', async () => {
-    try {
-        if (!window.electronAPI || typeof window.electronAPI.openPage !== 'function') {
-            throw new Error('API do Electron não foi injetada pelo preload');
-        }
-        await window.electronAPI.openPage('produto.html');
-    } catch (error) {
-        console.error('Erro ao abrir a janela de cadastro de produtos:', error);
-    }
 });

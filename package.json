@@ -1,5 +1,5 @@
 {
-    "name": "deskivo",
+    "name": "lobo",
     "version": "1.0.0",
     "main": "app/renderer/main/index.js",
     "type": "module",
@@ -11,17 +11,22 @@
         "build:all": "electron-builder --win --linux"
     },
     "build": {
-        "appId": "com.deskivo.app",
-        "productName": "Deskivo",
-        "copyright": "Copyright © 2025 Deskivo",
+        "appId": "com.lobo.app",
+        "productName": "lobo",
+        "copyright": "Lobo 2024",
         "directories": {
-            "output": "C:/deskivo"
+            "output": "C:\\projeto"
         },
         "files": [
             "app/**/*",
             "node_modules/**/*",
-            "package.json",
-            ".env"
+            "package.json"
+        ],
+        "extraFiles": [
+            {
+                "from": ".env",
+                "to": ".env"
+            }
         ],
         "win": {
             "target": [
@@ -31,15 +36,14 @@
                         "x64"
                     ]
                 }
-            ],
-            "icon": "app/assets/icon.ico"
+            ]
         },
         "nsis": {
             "oneClick": false,
             "allowToChangeInstallationDirectory": true,
             "createDesktopShortcut": true,
             "createStartMenuShortcut": true,
-            "shortcutName": "Deskivo"
+            "shortcutName": "Lobo"
         },
         "linux": {
             "target": [

@@ -10,6 +10,14 @@ saveButton.addEventListener('click', async () => {
     try {
         const result = await window.electronAPI.saveUsuario(data);
         console.log('Usuario salvo com sucesso:', result);
+        await Swal.fire({
+            title: 'Sucesso!',
+            text: 'Usuario salva com sucesso.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            timer: 2000,
+            timerProgressBar: true,
+        });
     } catch (error) {
         console.error('Erro ao salvar usuario:', error);
     }

@@ -1,8 +1,9 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
+import { ilike, or, sql, asc } from 'drizzle-orm';
 import Connection from '../Connection.js';
 import { empresa } from '../schema.js';
 
-export default class ProductRepository {
+export default class EmpresaRepository {
     static async insert(data) {
         const client = await Connection.connect();
         const db = drizzle(client);
@@ -18,52 +19,40 @@ export default class ProductRepository {
             client.release();
         }
     }
-    static async search({ draw, start = 0, length = 10, search = '' }) {
+    static async search(data) {
+        //Captura o termo de pesquisa sem o %%
+        const rawSearch = String(data?.term ?? '').trim();
+        //Captura o termo da pesquisa já aplicando o %%
+        const terms = `%${data?.term}%`;
         try {
-            const term = `%${search}%`;
+            //Abre a conexão com banco de dados
+            const client = await Connection.connect();
+            const db = drizzle(client);
+            const whereClause =
+                rawSearch !== ''
+                    ? or(
+                        sql`${empresa.id}::text ILIKE ${terms}`,
+                        ilike(empresa.razaoSocial, terms),
+                        ilike(empresa.nomeFantasia, terms),
+                        ilike(empresa.cnpj, terms),
+                        ilike(empresa.ie, terms)
+                    )
+                    : undefined;
 
-            // Total sem filtro
-            const totalResult = await db
-                .select({ total: sql`count(*)::int` })
-                .from(empresa);
-
-            const recordsTotal = totalResult[0]?.total ?? 0;
-
-            // Total filtrado
-            const filteredResult = await db
-                .select({ filtered: sql`count(*)::int` })
-                .from(empresa)
-                .where(sql`
-                    name     ILIKE ${term}
-                    OR category ILIKE ${term}
-                `);
-
-            const recordsFiltered = filteredResult[0]?.filtered ?? 0;
-
-            // Dados da página
-            const data = await db
+            const result = await db
                 .select()
                 .from(empresa)
-                .where(sql`
-                    name     ILIKE ${term}
-                    OR category ILIKE ${term}
-                `)
-                .limit(length)
-                .offset(start)
-                .orderBy(empresa.name);
+                .where(whereClause)
+                .orderBy(asc(empresa.razaoSocial, empresa.id, empresa.cnpj))
+                .offset(data?.offset)
+                .limit(data?.limit);
 
             return {
-                draw,
-                recordsTotal,
-                recordsFiltered,
-                data,
+                data: result
             };
-
         } catch (error) {
             console.error('[empresaRepository] Erro na busca:', error.message);
-
             return {
-                draw,
                 recordsTotal: 0,
                 recordsFiltered: 0,
                 data: [],
